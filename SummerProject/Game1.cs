@@ -14,6 +14,7 @@ namespace SummerProject
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Texture2D player_sprite;
+        Texture2D floor_sprite;
         player controllable_character = new player();
 
         public Game1()
@@ -34,6 +35,7 @@ namespace SummerProject
 
             base.Initialize();
             player_sprite = Content.Load<Texture2D>(controllable_character.spriteName);
+            floor_sprite = Content.Load<Texture2D>("Test_graphics/tile_1");
         }
 
         /// <summary>
@@ -84,6 +86,13 @@ namespace SummerProject
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
+            for (int y = 0; y < 30; y++)
+            {
+                for (int x = 0; x < 50; x++)
+                {
+                    spriteBatch.Draw(floor_sprite, new Rectangle(x * 16, y*16, 16, 16), Color.Crimson);
+                }
+            }
             spriteBatch.Draw(player_sprite, new Rectangle(controllable_character.x, controllable_character.y, 48, 16), Color.White);
             spriteBatch.End();
 
