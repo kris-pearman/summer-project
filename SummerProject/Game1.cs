@@ -16,11 +16,14 @@ namespace SummerProject
         Texture2D player_sprite;
         Texture2D floor_sprite;
         player controllable_character = new player();
+        private Viewport topViewport;
+        private RenderTarget2D _nativeRenderTarget;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            
         }
 
         /// <summary>
@@ -36,6 +39,12 @@ namespace SummerProject
             base.Initialize();
             player_sprite = Content.Load<Texture2D>(controllable_character.spriteName);
             floor_sprite = Content.Load<Texture2D>("Test_graphics/tile_1");
+            topViewport = new Viewport();
+            topViewport.X = 0;
+            topViewport.Y = 0;
+            topViewport.Width = 400;
+            topViewport.Height = 240;
+            _nativeRenderTarget = new RenderTarget2D(GraphicsDevice, 480, 240);
         }
 
         /// <summary>
@@ -84,17 +93,28 @@ namespace SummerProject
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            // GraphicsDevice.Viewport = topViewport;
+            GraphicsDevice.SetRenderTarget(_nativeRenderTarget);
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
             for (int y = 0; y < 30; y++)
             {
                 for (int x = 0; x < 50; x++)
                 {
-                    spriteBatch.Draw(floor_sprite, new Rectangle(x * 16, y*16, 16, 16), Color.Crimson);
+                    spriteBatch.Draw(floor_sprite, new Rectangle(x * 16, y * 16, 16, 16), Color.Crimson);
                 }
             }
             spriteBatch.Draw(player_sprite, new Rectangle(controllable_character.x, controllable_character.y, 48, 16), Color.White);
             spriteBatch.End();
+            // now render your game like you normally would, but if you change the render target somewhere,
+            // make sure you set it back to this one and not the backbuffer
+            // after drawing the game at native resolution we can render _nativeRenderTarget to the backbuffer!
+            // First set the GraphicsDevice target back to the backbuffer
+            GraphicsDevice.SetRenderTarget(null);
+            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            spriteBatch.Draw(_nativeRenderTarget, new Rectangle(0,0,800,480), Color.White);
+            spriteBatch.End();
+
 
             // TODO: Add your drawing code here
 
