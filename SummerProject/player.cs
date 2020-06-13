@@ -1,13 +1,8 @@
 ﻿using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SummerProject
 {
-    class player
+    public class Player
     {
         public int x = 0;
         public int y = 0;
@@ -18,7 +13,7 @@ namespace SummerProject
             KeyboardState state = Keyboard.GetState();
 
             if (state.IsKeyDown(Keys.Down))
-                    {
+            {
                 y++;
             };
             if (state.IsKeyDown(Keys.Up))

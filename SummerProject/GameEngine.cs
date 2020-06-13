@@ -1,25 +1,23 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace SummerProject
 {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game
+    public class GameEngine : Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-        Texture2D player_sprite;
-        Texture2D floor_sprite;
-        player controllable_character = new player();
+        private readonly GraphicsDeviceManager graphics;
+        private SpriteBatch spriteBatch;
+        private Texture2D playerSprite;
+        private Texture2D floorSprite;
+        private Player player = new Player();
         private Viewport topViewport;
         private RenderTarget2D _nativeRenderTarget;
 
-        public Game1()
+        public GameEngine()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -37,8 +35,8 @@ namespace SummerProject
             // TODO: Add your initialization logic here
 
             base.Initialize();
-            player_sprite = Content.Load<Texture2D>(controllable_character.spriteName);
-            floor_sprite = Content.Load<Texture2D>("Test_graphics/tile_1");
+            playerSprite = Content.Load<Texture2D>(player.spriteName);
+            floorSprite = Content.Load<Texture2D>("Test_graphics/tile_1");
             topViewport = new Viewport();
             topViewport.X = 0;
             topViewport.Y = 0;
@@ -80,7 +78,7 @@ namespace SummerProject
                 Exit();
             }
 
-            controllable_character.GetPlayerInput();
+            player.GetPlayerInput();
 
             // TODO: Add your update logic here
 
@@ -93,7 +91,6 @@ namespace SummerProject
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            // GraphicsDevice.Viewport = topViewport;
             GraphicsDevice.SetRenderTarget(_nativeRenderTarget);
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
@@ -101,10 +98,10 @@ namespace SummerProject
             {
                 for (int x = 0; x < 50; x++)
                 {
-                    spriteBatch.Draw(floor_sprite, new Rectangle(x * 16, y * 16, 16, 16), Color.Crimson);
+                    spriteBatch.Draw(floorSprite, new Rectangle(x * 16, y * 16, 16, 16), Color.Crimson);
                 }
             }
-            spriteBatch.Draw(player_sprite, new Rectangle(controllable_character.x, controllable_character.y, 48, 16), Color.White);
+            spriteBatch.Draw(playerSprite, new Rectangle(player.x, player.y, 48, 16), Color.White);
             spriteBatch.End();
             // now render your game like you normally would, but if you change the render target somewhere,
             // make sure you set it back to this one and not the backbuffer
