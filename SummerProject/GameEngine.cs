@@ -9,6 +9,8 @@ namespace SummerProject
     /// </summary>
     public class GameEngine : Game
     {
+        // Reference to graphics has to be maintained here otherwise application can't draw anymore.    
+          
         private readonly GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private Texture2D playerSprite;
@@ -19,6 +21,7 @@ namespace SummerProject
 
         public GameEngine()
         {
+            // These also need to be left to set up the content directory and to initialise the graphics device even if they are not referenced here.
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             
