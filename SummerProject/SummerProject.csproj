@@ -44,6 +44,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="GameEngine.cs" />
+    <Compile Include="Input\IKeyboard.cs" />
+    <Compile Include="Input\KeyboardKeys.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SummerProject.Input;
 
 namespace SummerProject
 {
@@ -10,21 +11,21 @@ namespace SummerProject
     public class GameEngine : Game
     {
         // Reference to graphics has to be maintained here otherwise application can't draw anymore.    
-          
-        private readonly GraphicsDeviceManager graphics;
-        private SpriteBatch spriteBatch;
-        private Texture2D playerSprite;
-        private Texture2D floorSprite;
-        private Player player = new Player();
-        private Viewport topViewport;
+
+        private readonly GraphicsDeviceManager _graphics;
+        private SpriteBatch _spriteBatch;
+        private Texture2D _playerSprite;
+        private Texture2D _floorSprite;
+        private Player _player = new Player(new KeyboardKeys());
+        private Viewport _topViewport;
         private RenderTarget2D _nativeRenderTarget;
 
         public GameEngine()
         {
             // These also need to be left to set up the content directory and to initialise the graphics device even if they are not referenced here.
-            graphics = new GraphicsDeviceManager(this);
+            _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            
+
         }
 
         /// <summary>
@@ -38,13 +39,13 @@ namespace SummerProject
             // TODO: Add your initialization logic here
 
             base.Initialize();
-            playerSprite = Content.Load<Texture2D>(player.spriteName);
-            floorSprite = Content.Load<Texture2D>("Test_graphics/tile_1");
-            topViewport = new Viewport();
-            topViewport.X = 0;
-            topViewport.Y = 0;
-            topViewport.Width = 400;
-            topViewport.Height = 240;
+            _playerSprite = Content.Load<Texture2D>(_player.SpriteLocation);
+            _floorSprite = Content.Load<Texture2D>("Test_graphics/tile_1");
+            _topViewport = new Viewport();
+            _topViewport.X = 0;
+            _topViewport.Y = 0;
+            _topViewport.Width = 400;
+            _topViewport.Height = 240;
             _nativeRenderTarget = new RenderTarget2D(GraphicsDevice, 480, 240);
         }
 
@@ -55,7 +56,7 @@ namespace SummerProject
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
         }
@@ -81,7 +82,7 @@ namespace SummerProject
                 Exit();
             }
 
-            player.GetPlayerInput();
+            _player.GetPlayerInput();
 
             // TODO: Add your update logic here
 
@@ -96,24 +97,24 @@ namespace SummerProject
         {
             GraphicsDevice.SetRenderTarget(_nativeRenderTarget);
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            spriteBatch.Begin();
+            _spriteBatch.Begin();
             for (int y = 0; y < 30; y++)
             {
                 for (int x = 0; x < 50; x++)
                 {
-                    spriteBatch.Draw(floorSprite, new Rectangle(x * 16, y * 16, 16, 16), Color.Crimson);
+                    _spriteBatch.Draw(_floorSprite, new Rectangle(x * 16, y * 16, 16, 16), Color.Crimson);
                 }
             }
-            spriteBatch.Draw(playerSprite, new Rectangle(player.x, player.y, 48, 16), Color.White);
-            spriteBatch.End();
+            _spriteBatch.Draw(_playerSprite, new Rectangle(_player.X, _player.Y, 48, 16), Color.White);
+            _spriteBatch.End();
             // now render your game like you normally would, but if you change the render target somewhere,
             // make sure you set it back to this one and not the backbuffer
             // after drawing the game at native resolution we can render _nativeRenderTarget to the backbuffer!
             // First set the GraphicsDevice target back to the backbuffer
             GraphicsDevice.SetRenderTarget(null);
-            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            spriteBatch.Draw(_nativeRenderTarget, new Rectangle(0,0,800,480), Color.White);
-            spriteBatch.End();
+            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            _spriteBatch.Draw(_nativeRenderTarget, new Rectangle(0, 0, 800, 480), Color.White);
+            _spriteBatch.End();
 
 
             // TODO: Add your drawing code here

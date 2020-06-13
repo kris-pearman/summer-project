@@ -1,32 +1,38 @@
 ﻿using Microsoft.Xna.Framework.Input;
+using SummerProject.Input;
+
 
 namespace SummerProject
 {
     public class Player
     {
-        public int x = 0;
-        public int y = 0;
-        public string spriteName = "Test_graphics/dummy_player";
-            
+        private readonly IKeyboard _keyboard;
+        public int X = 0;
+        public int Y = 0;
+        public string SpriteLocation = "Test_graphics/dummy_player";
+
+        public Player(IKeyboard keyboard)
+        {
+            _keyboard = keyboard;
+        }
+
         public void GetPlayerInput()
         {
-            KeyboardState state = Keyboard.GetState();
-
-            if (state.IsKeyDown(Keys.Down))
+            if (_keyboard.IsKeyDown(Keys.Down))
             {
-                y++;
+                Y++;
             };
-            if (state.IsKeyDown(Keys.Up))
+            if (_keyboard.IsKeyDown(Keys.Up))
             {
-                y--;
+                Y--;
             };
-            if (state.IsKeyDown(Keys.Left))
+            if (_keyboard.IsKeyDown(Keys.Left))
             {
-                x--;
+                X--;
             };
-            if (state.IsKeyDown(Keys.Right))
+            if (_keyboard.IsKeyDown(Keys.Right))
             {
-                x++;
+                X++;
             };
         }
 
