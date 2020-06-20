@@ -7,8 +7,18 @@ namespace SummerProject
     public class Player
     {
         private readonly IKeyboard _keyboard;
+
         public int X = 0;
         public int Y = 0;
+
+        public Location Location
+        {
+            get
+            {
+                return new Location { X = X, Y = Y };
+            }
+        }
+
         public string SpriteLocation = "Test_graphics/dummy_player";
 
         public Player(IKeyboard keyboard)
