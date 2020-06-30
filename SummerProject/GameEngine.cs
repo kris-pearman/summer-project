@@ -17,17 +17,24 @@ namespace SummerProject
         private Texture2D _playerSprite;
         private Texture2D _floorSprite;
         private Player _player = new Player(new KeyboardKeys());
-        private Viewport _topViewport;
         private RenderTarget2D _nativeRenderTarget;
         private MapDetails _mapDetails;
+        private readonly Location _screenSize = new Location
+        {
+            X = 480,
+            Y = 240
+        };
+        private readonly Location _screenResolution = new Location
+        {
+            X = 800,
+            Y = 480
+        };
 
         public GameEngine()
         {
             // These also need to be left to set up the content directory and to initialise the graphics device even if they are not referenced here.
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-         
-
         }
 
         /// <summary>
@@ -36,19 +43,11 @@ namespace SummerProject
         /// related content.  Calling base.Initialize will enumerate through any components
         /// and initialize them as well.
         /// </summary>
+        /// 
+
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
             base.Initialize();
-            _playerSprite = Content.Load<Texture2D>(_player.SpriteLocation);
-            _floorSprite = Content.Load<Texture2D>("Test_graphics/tile_1");
-            _topViewport = new Viewport();
-            _topViewport.X = 0;
-            _topViewport.Y = 0;
-            _topViewport.Width = 400;
-            _topViewport.Height = 240;
-            _nativeRenderTarget = new RenderTarget2D(GraphicsDevice, 480, 240);
             _mapDetails = new MapDetails(new Location { X = 0, Y = 0 });
         }
 
@@ -60,8 +59,9 @@ namespace SummerProject
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            // TODO: use this.Content to load your game content here
+            _playerSprite = Content.Load<Texture2D>(_player.SpriteLocation);
+            _floorSprite = Content.Load<Texture2D>("Test_graphics/tile_1");
+            _nativeRenderTarget = new RenderTarget2D(GraphicsDevice, _screenSize.X, _screenSize.Y);
         }
 
         /// <summary>
@@ -86,9 +86,6 @@ namespace SummerProject
             }
 
             _player.GetPlayerInput();
-
-            // TODO: Add your update logic here
-
             _mapDetails.CalculateMapPosition(_player.Location);
 
             base.Update(gameTime);
@@ -105,16 +102,33 @@ namespace SummerProject
             _spriteBatch.Begin();
 
             var offset = _mapDetails.GetDrawOffset();
-
+            var blockSize = 16;
             for (int y = 0; y < 30; y++)
             {
                 for (int x = 0; x < 50; x++)
                 {
-                    _spriteBatch.Draw(_floorSprite, new Rectangle((x * 16) + offset.X, (y * 16) + offset.Y, 16, 16), Color.Crimson);
+                    _spriteBatch.Draw(
+                        _floorSprite,
+                        new Rectangle(
+                            (x * blockSize) + offset.X,
+                            (y * blockSize) + offset.Y,
+                            blockSize,
+                            blockSize),
+                        Color.Crimson
+                    );
                 }
             }
-            
-            _spriteBatch.Draw(_playerSprite, new Rectangle(240-16, 120-8, 48, 16), Color.White);
+            var playerDrawLocation = GetPlayerDrawLocation(_screenSize, _player);
+
+            _spriteBatch.Draw(_playerSprite,
+                new Rectangle(
+                    playerDrawLocation.X,
+                    playerDrawLocation.Y,
+                    _player.Width,
+                    _player.Height),
+                Color.White
+            );
+
             _spriteBatch.End();
             // now render your game like you normally would, but if you change the render target somewhere,
             // make sure you set it back to this one and not the backbuffer
@@ -122,13 +136,24 @@ namespace SummerProject
             // First set the GraphicsDevice target back to the backbuffer
             GraphicsDevice.SetRenderTarget(null);
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            _spriteBatch.Draw(_nativeRenderTarget, new Rectangle(0, 0, 800, 480), Color.White);
+            
+            _spriteBatch.Draw(_nativeRenderTarget, new Rectangle(0, 0, _screenResolution.X, _screenResolution.Y), Color.White);
             _spriteBatch.End();
 
-
-            // TODO: Add your drawing code here
-
             base.Draw(gameTime);
+        }
+
+        private Location GetPlayerDrawLocation(Location screenSize, Player player)
+        {
+            return new Location {
+                X = GetCentralDrawPosition(screenSize.X, player.Width),
+                Y = GetCentralDrawPosition(screenSize.Y, player.Height)
+            };
+        }
+
+        private int GetCentralDrawPosition(int screenPoint, int playerPoint)
+        {
+            return (screenPoint / 2) - (playerPoint / 2);
         }
     }
 }

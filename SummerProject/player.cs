@@ -10,6 +10,8 @@ namespace SummerProject
 
         public int X = 0;
         public int Y = 0;
+        public int Width = 48;
+        public int Height = 16;
 
         public Location Location
         {
