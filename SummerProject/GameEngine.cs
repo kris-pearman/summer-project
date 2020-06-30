@@ -19,12 +19,14 @@ namespace SummerProject
         private Player _player = new Player(new KeyboardKeys());
         private Viewport _topViewport;
         private RenderTarget2D _nativeRenderTarget;
+        private MapDetails _mapDetails;
 
         public GameEngine()
         {
             // These also need to be left to set up the content directory and to initialise the graphics device even if they are not referenced here.
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+         
 
         }
 
@@ -47,6 +49,7 @@ namespace SummerProject
             _topViewport.Width = 400;
             _topViewport.Height = 240;
             _nativeRenderTarget = new RenderTarget2D(GraphicsDevice, 480, 240);
+            _mapDetails = new MapDetails(new Location { X = 0, Y = 0 });
         }
 
         /// <summary>
@@ -86,6 +89,8 @@ namespace SummerProject
 
             // TODO: Add your update logic here
 
+            _mapDetails.CalculateMapPosition(_player.Location);
+
             base.Update(gameTime);
         }
 
@@ -98,14 +103,18 @@ namespace SummerProject
             GraphicsDevice.SetRenderTarget(_nativeRenderTarget);
             GraphicsDevice.Clear(Color.CornflowerBlue);
             _spriteBatch.Begin();
+
+            var offset = _mapDetails.GetDrawOffset();
+
             for (int y = 0; y < 30; y++)
             {
                 for (int x = 0; x < 50; x++)
                 {
-                    _spriteBatch.Draw(_floorSprite, new Rectangle(x * 16, y * 16, 16, 16), Color.Crimson);
+                    _spriteBatch.Draw(_floorSprite, new Rectangle((x * 16) + offset.X, (y * 16) + offset.Y, 16, 16), Color.Crimson);
                 }
             }
-            _spriteBatch.Draw(_playerSprite, new Rectangle(_player.X, _player.Y, 48, 16), Color.White);
+            
+            _spriteBatch.Draw(_playerSprite, new Rectangle(240-16, 120-8, 48, 16), Color.White);
             _spriteBatch.End();
             // now render your game like you normally would, but if you change the render target somewhere,
             // make sure you set it back to this one and not the backbuffer
