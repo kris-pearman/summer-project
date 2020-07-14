@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SharpDX.Direct3D9;
 using SummerProject.Input;
 
 namespace SummerProject
@@ -21,11 +22,15 @@ namespace SummerProject
         private Enemy _enemy = new Enemy();
         private RenderTarget2D _nativeRenderTarget;
         private MapDetails _mapDetails;
+        private SpriteFont _font;
+        private int _score = 0;
+
         private readonly Location _screenSize = new Location
         {
             X = 480,
             Y = 240
         };
+        
         private readonly Location _screenResolution = new Location
         {
             X = 800,
@@ -65,6 +70,8 @@ namespace SummerProject
             _enemySprite = Content.Load<Texture2D>(_enemy.SpriteLocation);
             _floorSprite = Content.Load<Texture2D>("Test_graphics/tile_1");
             _nativeRenderTarget = new RenderTarget2D(GraphicsDevice, _screenSize.X, _screenSize.Y);
+            _font = Content.Load<SpriteFont>("Font");
+
         }
 
         /// <summary>
@@ -139,6 +146,14 @@ namespace SummerProject
                     _enemy.Width,
                     _enemy.Height),
                 Color.White
+               );
+
+            //drawing text
+            _spriteBatch.DrawString(
+                _font,
+                $"Score: {_score}",
+                new Vector2(10, 5),
+                Color.AntiqueWhite
                 );
 
             _spriteBatch.End();
@@ -147,7 +162,7 @@ namespace SummerProject
             // after drawing the game at native resolution we can render _nativeRenderTarget to the backbuffer!
             // First set the GraphicsDevice target back to the backbuffer
             GraphicsDevice.SetRenderTarget(null);
-            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            _spriteBatch.Begin(samplerState: Microsoft.Xna.Framework.Graphics.SamplerState.PointClamp);
             
             _spriteBatch.Draw(_nativeRenderTarget, new Rectangle(0, 0, _screenResolution.X, _screenResolution.Y), Color.White);
             _spriteBatch.End();

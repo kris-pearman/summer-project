@@ -13,7 +13,6 @@ namespace SummerProject
         public int Width = 48;
         public int Height = 16;
         public string enemyType = "test";
-
         public Location Location
         {
             get
