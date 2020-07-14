@@ -16,7 +16,9 @@ namespace SummerProject
         private SpriteBatch _spriteBatch;
         private Texture2D _playerSprite;
         private Texture2D _floorSprite;
+        private Texture2D _enemySprite;
         private Player _player = new Player(new KeyboardKeys());
+        private Enemy _enemy = new Enemy();
         private RenderTarget2D _nativeRenderTarget;
         private MapDetails _mapDetails;
         private readonly Location _screenSize = new Location
@@ -60,6 +62,7 @@ namespace SummerProject
             // Create a new SpriteBatch, which can be used to draw textures.
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _playerSprite = Content.Load<Texture2D>(_player.SpriteLocation);
+            _enemySprite = Content.Load<Texture2D>(_enemy.SpriteLocation);
             _floorSprite = Content.Load<Texture2D>("Test_graphics/tile_1");
             _nativeRenderTarget = new RenderTarget2D(GraphicsDevice, _screenSize.X, _screenSize.Y);
         }
@@ -119,7 +122,7 @@ namespace SummerProject
                 }
             }
             var playerDrawLocation = GetPlayerDrawLocation(_screenSize, _player);
-
+            
             _spriteBatch.Draw(_playerSprite,
                 new Rectangle(
                     playerDrawLocation.X,
@@ -128,6 +131,15 @@ namespace SummerProject
                     _player.Height),
                 Color.White
             );
+
+            _spriteBatch.Draw(_enemySprite, 
+                new Rectangle(
+                    _enemy.X + offset.X,
+                    _enemy.Y + offset.Y,
+                    _enemy.Width,
+                    _enemy.Height),
+                Color.White
+                );
 
             _spriteBatch.End();
             // now render your game like you normally would, but if you change the render target somewhere,
@@ -150,6 +162,7 @@ namespace SummerProject
                 Y = GetCentralDrawPosition(screenSize.Y, player.Height)
             };
         }
+
 
         private int GetCentralDrawPosition(int screenPoint, int playerPoint)
         {
