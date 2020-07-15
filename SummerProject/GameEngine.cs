@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SharpDX.Direct2D1.Effects;
 using SharpDX.Direct3D9;
 using SummerProject.Input;
 using System;
@@ -20,6 +21,8 @@ namespace SummerProject
         private Texture2D _playerSprite;
         private Texture2D _floorSprite;
         private Texture2D _enemySprite;
+        private Texture2D _wallSprite;
+        private Texture2D _ceilingSprite;
         private Player _player = new Player(new KeyboardKeys());
         private Enemy _enemy = new Enemy();
         private RenderTarget2D _nativeRenderTarget;
@@ -64,6 +67,7 @@ namespace SummerProject
 
         private void populate_enemy_list()
         {
+            //Making a list of 3 enemies in different positions just so I can see how it's done later on
             _enemyList.Add(new Enemy() { X = 30, Y = 30 });
             _enemyList.Add(new Enemy() { X = 50, Y = 50 });
             _enemyList.Add(new Enemy() { X = 80, Y = 70 });
@@ -80,6 +84,8 @@ namespace SummerProject
             _playerSprite = Content.Load<Texture2D>(_player.SpriteLocation);
             _enemySprite = Content.Load<Texture2D>(_enemy.SpriteLocation);
             _floorSprite = Content.Load<Texture2D>("Test_graphics/tile_1");
+            _wallSprite = Content.Load<Texture2D>("Test_graphics/wall_lowmid");
+            _ceilingSprite = Content.Load<Texture2D>("Test_graphics/wall_mid");
             _nativeRenderTarget = new RenderTarget2D(GraphicsDevice, _screenSize.X, _screenSize.Y);
             _font = Content.Load<SpriteFont>("Font");
 
@@ -106,8 +112,6 @@ namespace SummerProject
                 Exit();
             }
 
-
-
             _player.GetPlayerInput();
             _mapDetails.CalculateMapPosition(_player.Location);
 
@@ -125,6 +129,55 @@ namespace SummerProject
             _spriteBatch.Begin();
 
             var offset = _mapDetails.GetDrawOffset();
+            DrawBackground(offset);
+            var playerDrawLocation = GetPlayerDrawLocation(_screenSize, _player);
+
+            DrawWalls(offset);
+            DrawEnemies(offset);
+            DrawPlayer(playerDrawLocation);
+ 
+
+            _spriteBatch.End();
+
+            //draws everything previously stated to the actual screen size as opposed to a smaller resolution
+            GraphicsDevice.SetRenderTarget(null);
+            _spriteBatch.Begin(samplerState: Microsoft.Xna.Framework.Graphics.SamplerState.PointClamp);
+            _spriteBatch.Draw(_nativeRenderTarget, new Rectangle(0, 0, _screenResolution.X, _screenResolution.Y), Color.White);
+
+            //Anything drawn after here will not be rescaled to the window size, probably best for text?
+            //drawing text
+            DrawScore();
+
+            _spriteBatch.End();
+
+            base.Draw(gameTime);
+        }
+        private void DrawWalls(Location offset)
+        {
+            for (int x = 0; x<50; x++)
+            {
+                _spriteBatch.Draw(
+                    _wallSprite,
+                    new Rectangle(
+                        x * 32 + offset.X,
+                        0 + offset.Y,
+                        32,
+                        32),
+                    Color.White
+                    );
+                                _spriteBatch.Draw(
+                    _ceilingSprite,
+                    new Rectangle(
+                        x * 32 + offset.X,
+                        -32 + offset.Y,
+                        32,
+                        32),
+                    Color.White
+                    );
+            }
+        }
+        private void DrawBackground(Location offset)
+        {
             var blockSize = 16;
             for (int y = 0; y < 30; y++)
             {
@@ -141,11 +194,32 @@ namespace SummerProject
                     );
                 }
             }
-            var playerDrawLocation = GetPlayerDrawLocation(_screenSize, _player);
-            
+        }
 
+        private void DrawScore()
+        {
+            _spriteBatch.DrawString(
+                            _font,
+                            $"Score: {_score}",
+                            new Vector2(10, 5),
+                            Color.AntiqueWhite
+                            );
+        }
 
+        private void DrawPlayer(Location playerDrawLocation)
+        {
+            _spriteBatch.Draw(_playerSprite,
+            new Rectangle(
+                playerDrawLocation.X,
+                playerDrawLocation.Y,
+                _player.Width,
+                _player.Height),
+            Color.White
+            );
+        }
 
+        private void DrawEnemies(Location offset)
+        {
             foreach (Enemy _enemy in _enemyList)
             {
                 _spriteBatch.Draw(_enemySprite,
@@ -157,36 +231,6 @@ namespace SummerProject
                 Color.White
                );
             }
-
-            _spriteBatch.Draw(_playerSprite,
-            new Rectangle(
-                playerDrawLocation.X,
-                playerDrawLocation.Y,
-                _player.Width,
-                _player.Height),
-            Color.White
-            );
-
-            //drawing text
-            _spriteBatch.DrawString(
-                _font,
-                $"Score: {_score}",
-                new Vector2(10, 5),
-                Color.AntiqueWhite
-                );
-
-            _spriteBatch.End();
-            // now render your game like you normally would, but if you change the render target somewhere,
-            // make sure you set it back to this one and not the backbuffer
-            // after drawing the game at native resolution we can render _nativeRenderTarget to the backbuffer!
-            // First set the GraphicsDevice target back to the backbuffer
-            GraphicsDevice.SetRenderTarget(null);
-            _spriteBatch.Begin(samplerState: Microsoft.Xna.Framework.Graphics.SamplerState.PointClamp);
-            
-            _spriteBatch.Draw(_nativeRenderTarget, new Rectangle(0, 0, _screenResolution.X, _screenResolution.Y), Color.White);
-            _spriteBatch.End();
-
-            base.Draw(gameTime);
         }
 
         private Location GetPlayerDrawLocation(Location screenSize, Player player)
