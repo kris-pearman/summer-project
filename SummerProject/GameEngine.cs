@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SharpDX.Direct3D9;
 using SummerProject.Input;
+using System;
+using System.Collections.Generic;
 
 namespace SummerProject
 {
@@ -24,6 +26,7 @@ namespace SummerProject
         private MapDetails _mapDetails;
         private SpriteFont _font;
         private int _score = 0;
+        List<Enemy> _enemyList = new List<Enemy>();
 
         private readonly Location _screenSize = new Location
         {
@@ -56,6 +59,14 @@ namespace SummerProject
         {
             base.Initialize();
             _mapDetails = new MapDetails(new Location { X = 0, Y = 0 });
+            populate_enemy_list();
+        }
+
+        private void populate_enemy_list()
+        {
+            _enemyList.Add(new Enemy() { X = 30, Y = 30 });
+            _enemyList.Add(new Enemy() { X = 50, Y = 50 });
+            _enemyList.Add(new Enemy() { X = 80, Y = 70 });
         }
 
         /// <summary>
@@ -95,6 +106,8 @@ namespace SummerProject
                 Exit();
             }
 
+
+
             _player.GetPlayerInput();
             _mapDetails.CalculateMapPosition(_player.Location);
 
@@ -130,16 +143,12 @@ namespace SummerProject
             }
             var playerDrawLocation = GetPlayerDrawLocation(_screenSize, _player);
             
-            _spriteBatch.Draw(_playerSprite,
-                new Rectangle(
-                    playerDrawLocation.X,
-                    playerDrawLocation.Y,
-                    _player.Width,
-                    _player.Height),
-                Color.White
-            );
 
-            _spriteBatch.Draw(_enemySprite, 
+
+
+            foreach (Enemy _enemy in _enemyList)
+            {
+                _spriteBatch.Draw(_enemySprite,
                 new Rectangle(
                     _enemy.X + offset.X,
                     _enemy.Y + offset.Y,
@@ -147,6 +156,16 @@ namespace SummerProject
                     _enemy.Height),
                 Color.White
                );
+            }
+
+            _spriteBatch.Draw(_playerSprite,
+            new Rectangle(
+                playerDrawLocation.X,
+                playerDrawLocation.Y,
+                _player.Width,
+                _player.Height),
+            Color.White
+            );
 
             //drawing text
             _spriteBatch.DrawString(
